@@ -5,6 +5,7 @@ import Adafruit_DHT as tempsensor
 import Adafruit_GPIO.SPI as SPI
 import Adafruit_SSD1306
 import mh_z19
+import RPi.GPIO as GPIO
 
 # Libraries for time logging 
 import time
@@ -32,10 +33,28 @@ DHT_PIN  = 4
 # Nominated resolution time for storing csv data
 SAMPLE_TIME = 60
 
+# Set up the LED
+GPIO.setmode(GPIO.BCM)
+GPIO.setwarnings(False)
+ledPin = 11
+GPIO.setup(ledPin, GPIO.OUT)
+
+
+def led_on(pin, signal):
+    
+    if signal == 1:
+        GPIO.output(pin, GPIO.HIGH)
+    else:
+        GPIO.output(pin, GPIO.LOW)
+        
+        
+
 # Check if a file exists and create a new file
 try:
     
     fileName = "./datalog.csv"
+    
+    led_on(ledPin, 1)
     
     if os.path.isfile(fileName):
         
@@ -63,6 +82,7 @@ try:
     if os.stat(fileName).st_size == 0:
         
         file.write('Timestamp (MM/DD/YYYY HH:MM),Temperature (°C),Humidity (%),Co2 (ppm)\r\n')
+        
 except:
    pass
 
@@ -103,6 +123,7 @@ draw.text((x, top + 33), "    fresh",  font=font, fill=255)
 disp.image(image)
 disp.display()
 time.sleep(1)
+led_on(ledPin, 0)
 
 # Create a blank black rectangle
 draw.rectangle((0, 0, width, height), outline = 0, fill = 0)
@@ -131,8 +152,12 @@ averageTemperatureSum = 0
 averageCo2Sum = 0
 averageCount = 0
 
+
+
 while True:
+    
     try:
+        
         
         # If first reading, keep on retrying until we get first sample
         if tempFlag is 0:
@@ -172,17 +197,40 @@ while True:
             averageCo2Sum += Co2
             averageCount += 1
             
+                        
             # If first time, go for a longer sleep
             if tempFlag == 0:
                 
                 # This check is to make sure we give enough time for everything to boot up
-                time.sleep(SAMPLE_TIME - (clock.now() - startTime).total_seconds())
+                
+                sleepTime = (SAMPLE_TIME - ((clock.now() - startTime).total_seconds()))/120
+                
+                for i in range(0, 60):
+                    
+                    led_on(ledPin,1)
+                    time.sleep(sleepTime)
+                     
+                    led_on(ledPin,0)
+                    time.sleep(sleepTime)
+                    
                 startTime = clock.now()
+                
+                
             
             else:
                 
                 # Sleep for the 10 second increment for the display
-                time.sleep(10 - (clock.now() - startTime).total_seconds())
+                
+                sleepTime = (10 - ((clock.now() - startTime).total_seconds()))/20
+                
+                for i in range(0, 10):
+                     
+                    led_on(ledPin,1)
+                    time.sleep(sleepTime)
+                     
+                    led_on(ledPin,0)
+                    time.sleep(sleepTime)
+                    
                 startTime = startTime + timedelta(seconds = 10)
             
             # Depending on the delay, write text on the display
@@ -190,7 +238,7 @@ while True:
                       font=font, fill=255)
             
             print('Current: {0}, {1:0.1f} C, {2:0.1f} %, {3} ppm \r'.format(startTime.strftime('%x %X'),\
-                                                                           temperature, humidity, Co2))            
+                                                                           temperature, humidity, Co2,))            
             
             # If we are ready to count average or if its the first reading
             if averageCount == 6 or tempFlag == 0:
@@ -199,16 +247,14 @@ while True:
                 file.write('{0},{1:0.1f},{2:0.1f}%,{3:.2f}\r\n'.format(startTime.strftime('%x %X'),\
                                                                        (averageTemperatureSum/averageCount), \
                                                                        (averageHumiditySum/averageCount), \
-                                                                       (averageCo2Sum/averageCount),\
-                                                                       ))
+                                                                       (averageCo2Sum/averageCount)))
                 file.flush()
                 os.fsync(file)
                 
                 print('\nAverage: {0}, {1:0.1f} C, {2:0.1f} %, {3:.0f} ppm \r\n'.format(startTime.strftime('%x %X'),\
                                                                        (averageTemperatureSum/averageCount), \
                                                                        (averageHumiditySum/averageCount), \
-                                                                       (averageCo2Sum/averageCount),\
-                                                                       ))
+                                                                       (averageCo2Sum/averageCount)))
                 
                 # Reset all average values and raise flag for 10 second readings
                 averageHumiditySum = averageTemperatureSum = averageCo2Sum = averageCount = 0
@@ -232,11 +278,19 @@ while True:
     # If any unwanted exceptions
     except Exception as exception:
     
+        led_on(ledPin, 1)
+        time.sleep(1)
+        led_on(ledPin, 0)
+        
         print(exception)
         sys.exit(0)
      
     # For Keyboard interrupts
     except KeyboardInterrupt as ex:
+        
+        led_on(ledPin, 1)
+        
+        print("\n Preparing to close application. Please wait for 3 seconds...\n")
         
         # Create black display
         draw.rectangle((0, 0, width, height), outline = 0, fill = 0)
@@ -272,6 +326,11 @@ while True:
         
         # Close csv file
         file.close()
+        
+        print("All done!")
+        print("Byeee! Stay Fresh!")
+        
+        led_on(ledPin, 0)
 
         print(ex)
         sys.exit(0)
