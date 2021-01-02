@@ -33,12 +33,16 @@ DHT_PIN  = 4
 # Nominated resolution time for storing csv data
 SAMPLE_TIME = 60
 
-# Set up the LED
+# Set up the LED with GPIO designators 
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
-ledPin = 11
-GPIO.setup(ledPin, GPIO.OUT)
+greenLed = 26
+yellowLED = 19
+redLED = 13
 
+GPIO.setup(greenLed, GPIO.OUT)
+GPIO.setup(yellowLED, GPIO.OUT)
+GPIO.setup(redLED, GPIO.OUT)
 
 def led_on(pin, signal):
     
@@ -54,7 +58,7 @@ try:
     
     fileName = "./datalog.csv"
     
-    led_on(ledPin, 1)
+    led_on(greenLed, 1)
     
     if os.path.isfile(fileName):
         
@@ -123,7 +127,7 @@ draw.text((x, top + 33), "    fresh",  font=font, fill=255)
 disp.image(image)
 disp.display()
 time.sleep(1)
-led_on(ledPin, 0)
+led_on(greenLed, 0)
 
 # Create a blank black rectangle
 draw.rectangle((0, 0, width, height), outline = 0, fill = 0)
@@ -207,11 +211,42 @@ while True:
                 
                 for i in range(0, 60):
                     
-                    led_on(ledPin,1)
-                    time.sleep(sleepTime)
+                    if Co2 >= 1000:
+                        
+                        led_on(greenLed,1)
+                        led_on(yellowLED,1)
+                        led_on(redLED,1)
+                    
+                        time.sleep(sleepTime)
                      
-                    led_on(ledPin,0)
-                    time.sleep(sleepTime)
+                        led_on(greenLed,0)
+                        led_on(yellowLED,0)
+                        led_on(redLED,0)
+                    
+                        time.sleep(sleepTime)
+                        
+                    elif Co2 >= 800:
+                        
+                        led_on(greenLed,1)
+                        led_on(yellowLED,1)
+                    
+                        time.sleep(sleepTime)
+                     
+                        led_on(greenLed,0)
+                        led_on(yellowLED,0)
+                    
+                        time.sleep(sleepTime)
+                        
+                    else:
+                        led_on(greenLed,1)
+                    
+                        time.sleep(sleepTime)
+                     
+                        led_on(greenLed,0)
+                    
+                        time.sleep(sleepTime)
+                    
+
                     
                 startTime = clock.now()
                 
@@ -225,11 +260,40 @@ while True:
                 
                 for i in range(0, 10):
                      
-                    led_on(ledPin,1)
-                    time.sleep(sleepTime)
+                    if Co2 >= 1000:
+                        
+                        led_on(greenLed,1)
+                        led_on(yellowLED,1)
+                        led_on(redLED,1)
+                    
+                        time.sleep(sleepTime)
                      
-                    led_on(ledPin,0)
-                    time.sleep(sleepTime)
+                        led_on(greenLed,0)
+                        led_on(yellowLED,0)
+                        led_on(redLED,0)
+                    
+                        time.sleep(sleepTime)
+                        
+                    elif Co2 >= 800:
+                        
+                        led_on(greenLed,1)
+                        led_on(yellowLED,1)
+                    
+                        time.sleep(sleepTime)
+                     
+                        led_on(greenLed,0)
+                        led_on(yellowLED,0)
+                    
+                        time.sleep(sleepTime)
+                        
+                    else:
+                        led_on(greenLed,1)
+                    
+                        time.sleep(sleepTime)
+                     
+                        led_on(greenLed,0)
+                    
+                        time.sleep(sleepTime)
                     
                 startTime = startTime + timedelta(seconds = 10)
             
@@ -278,9 +342,14 @@ while True:
     # If any unwanted exceptions
     except Exception as exception:
     
-        led_on(ledPin, 1)
+        led_on(redLED, 1)
+        led_on(greenLed,1)
+        led_on(yellowLED,1)
+
         time.sleep(1)
-        led_on(ledPin, 0)
+        led_on(redLED, 0)
+        led_on(greenLed,0)
+        led_on(yellowLED,0)
         
         print(exception)
         sys.exit(0)
@@ -288,7 +357,9 @@ while True:
     # For Keyboard interrupts
     except KeyboardInterrupt as ex:
         
-        led_on(ledPin, 1)
+        led_on(redLED, 1)
+        led_on(greenLed,1)
+        led_on(yellowLED,1)
         
         print("\n Preparing to close application. Please wait for 3 seconds...\n")
         
@@ -330,7 +401,9 @@ while True:
         print("All done!")
         print("Byeee! Stay Fresh!")
         
-        led_on(ledPin, 0)
-
+        led_on(redLED, 0)
+        led_on(greenLed,0)
+        led_on(yellowLED,0)
+        
         print(ex)
         sys.exit(0)
