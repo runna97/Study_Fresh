@@ -86,5 +86,3 @@ class Logger:
 		
 	def exit(self):
 		self.file.close()
-		
-	

@@ -27,26 +27,53 @@ from init import *
 
 # GPIO PIN Designator
 DHT_PIN = 4
-greenLed = 26
-yellowLED = 19
-redLED = 13
+
+redLED = LED(13)
+yellowLED = LED(19)
+greenLED = LED(26)
 
 excelFile = Logger("./datalog.csv")
 screen = DisplayScreen()
+leds = LedArray(redLED, yellowLED, greenLED)
+co2Sensor = CO2Sensor()
+
 
 def setup():
     
-    GPIO.setup(greenLed, GPIO.OUT)
-    GPIO.setup(yellowLED, GPIO.OUT)
-    GPIO.setup(redLED, GPIO.OUT)
-
     screen.loading_screen()
-    
-    led_on(greenLed, 0)
-    
     screen.opening_credits()
+    
+def sort(Co2, sleepTime):
+	
+	if Co2 >= 1000:
+	
+		leds.light_all(1)
+		
+		time.sleep(sleepTime)
+		
+		leds.light_all(0)
+		
+		time.sleep(sleepTime)
+	
+	elif Co2 >= 800:
+	
+		leds.light_duo(greenLED, yellowLED, 1)
+		
+		time.sleep(sleepTime)
+		
+		leds.light_duo(greenLED, yellowLED,0)
+		
+		time.sleep(sleepTime)
+	
+	else:
+		leds.light(greenLED, 1)
+		
+		time.sleep(sleepTime)
+		
+		leds.light(greenLED, 0)
+		
+		time.sleep(sleepTime)
 
-#setup()
 
 def main():
         
@@ -67,7 +94,7 @@ def main():
     
         try:
     
-            # If first reading, keep on retrying until we get first sample
+            # If first temp reading, keep on retrying until we get first sample
             if tempFlag is 0:
     
                 humidity, temperature = tempsensor.read_retry(DHT_SENSOR, DHT_PIN)
@@ -83,7 +110,7 @@ def main():
                     temperature = temperature1
     
             # Read MH-Z19
-            Co2 = mh_z19.read_all()['co2']
+            Co2 = co2Sensor.read()
     
             screen.blank()
     
@@ -112,40 +139,7 @@ def main():
     
                     for i in range(0, 60):
     
-                        if Co2 >= 1000:
-    
-                            led_on(greenLed, 1)
-                            led_on(yellowLED, 1)
-                            led_on(redLED, 1)
-    
-                            time.sleep(sleepTime)
-    
-                            led_on(greenLed, 0)
-                            led_on(yellowLED, 0)
-                            led_on(redLED, 0)
-    
-                            time.sleep(sleepTime)
-    
-                        elif Co2 >= 800:
-    
-                            led_on(greenLed, 1)
-                            led_on(yellowLED, 1)
-    
-                            time.sleep(sleepTime)
-    
-                            led_on(greenLed, 0)
-                            led_on(yellowLED, 0)
-    
-                            time.sleep(sleepTime)
-    
-                        else:
-                            led_on(greenLed, 1)
-    
-                            time.sleep(sleepTime)
-    
-                            led_on(greenLed, 0)
-    
-                            time.sleep(sleepTime)
+                        sort(Co2, sleepTime)
     
                     startTime = clock.now()
     
@@ -158,40 +152,7 @@ def main():
     
                     for i in range(0, 10):
     
-                        if Co2 >= 1000:
-    
-                            led_on(greenLed, 1)
-                            led_on(yellowLED, 1)
-                            led_on(redLED, 1)
-    
-                            time.sleep(sleepTime)
-    
-                            led_on(greenLed, 0)
-                            led_on(yellowLED, 0)
-                            led_on(redLED, 0)
-    
-                            time.sleep(sleepTime)
-    
-                        elif Co2 >= 800:
-    
-                            led_on(greenLed, 1)
-                            led_on(yellowLED, 1)
-    
-                            time.sleep(sleepTime)
-    
-                            led_on(greenLed, 0)
-                            led_on(yellowLED, 0)
-    
-                            time.sleep(sleepTime)
-    
-                        else:
-                            led_on(greenLed, 1)
-    
-                            time.sleep(sleepTime)
-    
-                            led_on(greenLed, 0)
-    
-                            time.sleep(sleepTime)
+                        sort(Co2, sleepTime)
     
                     startTime = startTime + timedelta(seconds=10)
     
@@ -239,14 +200,11 @@ def main():
         # If any unwanted exceptions
         except Exception as exception:
 
-            led_on(redLED, 1)
-            led_on(greenLed, 1)
-            led_on(yellowLED, 1)
+            leds.light_all(1)
     
             time.sleep(1)
-            led_on(redLED, 0)
-            led_on(greenLed, 0)
-            led_on(yellowLED, 0)
+            
+            leds.light_all(0)
     
             print(exception)
             sys.exit(0)
@@ -262,9 +220,7 @@ if __name__ == '__main__':
     # For Keyboard interrupts
     except KeyboardInterrupt as ex:
 
-        led_on(redLED, 1)
-        led_on(greenLed, 1)
-        led_on(yellowLED, 1)
+        leds.light_all(1)
     
         print("\n Preparing to close application. Please wait for 3 seconds...\n")
     
@@ -282,9 +238,7 @@ if __name__ == '__main__':
         print("All done!")
         print("Byeee! Stay Fresh!")
     
-        led_on(redLED, 0)
-        led_on(greenLed, 0)
-        led_on(yellowLED, 0)
+        leds.light_all(0)
     
         print(ex)
         sys.exit(0)
