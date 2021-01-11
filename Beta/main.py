@@ -40,7 +40,9 @@ co2Sensor = CO2Sensor()
 
 def setup():
     
+    
     screen.loading_screen()
+    time.sleep(1)
     screen.opening_credits()
     
 def sort(Co2, sleepTime):

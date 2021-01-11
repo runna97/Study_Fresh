@@ -50,6 +50,8 @@ class DisplayScreen:
 
 	def loading_screen(self):
 		
+		self.blank()
+		
 		# Load Mario Font to 'make it fancy'.
 		self.font = ImageFont.truetype('Mario-Kart-DS.ttf', 36)
 		self.write(1 , "study")
@@ -58,6 +60,8 @@ class DisplayScreen:
 		# Display image
 		self.disp.image(self.image)
 		self.disp.display()	
+		
+		
 		
 	def opening_credits(self):
 		
