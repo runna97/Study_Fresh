@@ -103,3 +103,4 @@ class LedArray:
             self.redLED.off()
             self.yellowLED.off()
             self.greenLED.off()
+

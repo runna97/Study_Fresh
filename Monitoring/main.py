@@ -19,7 +19,7 @@
 ###################################################################
 
 ###################################################################
-# Main Python Program File for Study Fresh Project
+# Main Python Program File for Study Fresh Monitoring Project
 ###################################################################
 
 ###################################################################
@@ -31,25 +31,21 @@ from init import *
 ###################################################################
 # Global Variables
 ###################################################################
-# Defines the pin for the temperature sensor
-DHT_PIN = 4
+
 # Defines the pin for the red LED
 redLED = LED(13)
+
 # Defines the pin for the yellow LED
 yellowLED = LED(19)
+
 # Defines the pin for the green LED
 greenLED = LED(26)
 
 ###################################################################
 # Global Classes
 ###################################################################
-# Class to manager the CO2 Sensor
-co2Sensor = CO2Sensor()
-# Class to manage the SD Card
-excelFile = Logger("./datalog.csv")
-# Class to manager the Display
-screen = DisplayScreen()
-# Class to manager the LED
+
+# Class to manage the LED
 leds = LedArray(redLED, yellowLED, greenLED)
 
 ###################################################################
@@ -82,15 +78,14 @@ def select(Co2, sleepTime):
 
     # If CO2 is greater than danger level,
     # light every LED
-
     if Co2 >= dangerLevel:
 
         # Light up all LEDs
-        leds.light_all(1)
+        leds.write_all(1)
         time.sleep(sleepTime)
 
         # Shut down all LEDs
-        leds.light_all(0)
+        leds.write_all(0)
         time.sleep(sleepTime)
 
     # If CO2 is greater than the warning level,
@@ -98,11 +93,11 @@ def select(Co2, sleepTime):
     elif Co2 >= warningLevel:
 
         # Light up green and yellow LED
-        leds.light_duo(greenLED, yellowLED, 1)
+        leds.write_duo(greenLED, yellowLED, 1)
         time.sleep(sleepTime)
 
         # Shut down green and yellow LED
-        leds.light_duo(greenLED, yellowLED, 0)
+        leds.write_duo(greenLED, yellowLED, 0)
         time.sleep(sleepTime)
 
     # If CO2 level is below the warning level,
@@ -110,11 +105,11 @@ def select(Co2, sleepTime):
     else:
 
         # Light up green LED
-        leds.light(greenLED, 1)
+        leds.write(greenLED, 1)
         time.sleep(sleepTime)
 
         # Shut down green LED
-        leds.light(greenLED, 0)
+        leds.write(greenLED, 0)
         time.sleep(sleepTime)
 
 ###################################################################
@@ -263,11 +258,11 @@ def main():
         # If any unwanted exceptions
         except Exception as exception:
 
-            leds.light_all(1)
+            leds.write_all(1)
 
             time.sleep(1)
 
-            leds.light_all(0)
+            leds.write_all(0)
 
             print(exception)
             sys.exit(0)
@@ -283,7 +278,7 @@ if __name__ == '__main__':
     # For Keyboard interrupts
     except KeyboardInterrupt as ex:
 
-        leds.light_all(1)
+        leds.write_all(1)
 
         print("\n Preparing to close application. Please wait for 3 seconds...\n")
 
@@ -301,7 +296,7 @@ if __name__ == '__main__':
         print("All done!")
         print("Byeee! Stay Fresh!")
 
-        leds.light_all(0)
+        leds.write_all(0)
 
         print(ex)
         sys.exit(0)

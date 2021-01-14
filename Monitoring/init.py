@@ -4,13 +4,13 @@
 #
 #   Using Citizen Science to Engage Children with Indoor Air Quality
 #
-#   Recipient of Queensland Citizen Science Grant from 
+#   Recipient of Queensland Citizen Science Grant from
 #   Queensland Department of Environment and Science
-# 
+#
 #   Project Lead: Dr Steven Snow
 #
 #   Project Members: Dr Lisa Ottenhaus, Dr Mashhuda Glencross
-#                    Dr Paola Leardini, Brett Beeson, 
+#                    Dr Paola Leardini, Brett Beeson,
 #                    Rohith Nunna
 #
 ###################################################################
@@ -19,11 +19,19 @@
 # Intialize all peripherals for Study Fresh Project
 ###################################################################
 
-# Import Peripherals
-
+###################################################################
+# File Imports
+###################################################################
+# Importing temperature sensor
 from peripherals.tempsensor import *
+
+# Importing CO2 sensor
 from peripherals.co2 import*
+
+# Importing Display module
 from peripherals.display import *
+
+# Importing LEDs as a single module
 from peripherals.led import*
 
 # Libraries for time logging
@@ -35,54 +43,98 @@ from datetime import timedelta
 import os
 import sys
 
+###################################################################
+# Global Variables
+###################################################################
 # Nominated resolution time for storing csv data
 SAMPLE_TIME = 60
 
+# Defines the pin for the temperature sensor
+DHT_PIN = 4
+
+###################################################################
+# Global Classes
+###################################################################
+
 class Logger:
-	""" Class designed to log sensor values to a .csv file
-	
-	"""
 
-	def __init__(self, fileName):
-		
-		self.fileName = fileName
-		if os.path.isfile(self.fileName):
+    """
+        Purpose: Class for logging sensor values to a .csv file
+        Inputs:  None
+        Outputs: None
+    """
 
-			self.counter = 0
+    def __init__(self, fileName):
+        """
+            Purpose: Initializing the new file by the filename given
+            Inputs:  filename is the nominated name for data logger
+            Outputs: None
+        """
 
-			while True:
-				self.counter += 1
-				self.newFileName = self.fileName.split(
-					".csv")[0] + "_" + str(self.counter) + ".csv"
+        self.fileName = fileName
 
-				# Check if the new file already exists
-				if os.path.isfile(self.newFileName):
+        # Check if the file already exists
+        if os.path.isfile(self.fileName):
 
-					continue
-				else:
+            self.counter = 0
 
-					self.fileName = self.newFileName
+            # If it does keep counting until a unique file is found
+            while True:
 
-					break
+                self.counter += 1
+                self.newFileName = self.fileName.split(
+                        ".csv")[0] + "_" + str(self.counter) + ".csv"
 
-		print('Created a new file: {0}\r'.format(self.fileName))
-	
-		#self.filename = filename
-		self.file = open(self.fileName, 'a+')
+                # Check if the new file already exists
+                if os.path.isfile(self.newFileName):
 
-		# Create headings for each file
-		if os.stat(self.fileName).st_size == 0:
+                    continue
+                else:
 
-			self.file.write(
-				'Timestamp (MM/DD/YYYY HH:MM),Temperature (°C),'
-				'Humidity (%),Co2 (ppm)\r\n')
-				
-	def log(self, text):
-		
-		self.file.write(text)
-		self.file.flush()
-		os.fsync(self.file)
-		
-		
-	def exit(self):
-		self.file.close()
+                    # The unique file is found, so break up
+                    self.fileName = self.newFileName
+                    break
+
+        print('Created a new file: {0}\r'.format(self.fileName))
+
+        # open the file name to store data
+        self.file = open(self.fileName, 'a+')
+
+        # Create a header row if file is empty
+        if os.stat(self.fileName).st_size == 0:
+
+            self.file.write(
+                    'Timestamp (MM/DD/YYYY HH:MM),Temperature (°C),'
+                    'Humidity (%),Co2 (ppm)\r\n')
+
+    def log(self, text):
+
+        """
+            Purpose: Function to write text to .csv
+            Inputs:  text is the string in the .csv
+            Outputs: None
+        """
+
+        self.file.write(text)
+        self.file.flush()
+        os.fsync(self.file)
+
+    def exit(self):
+
+        """
+            Purpose: Close the file
+            Inputs:  None
+            Outputs: None
+        """
+
+        self.file.close()
+
+
+# Class to manager the CO2 Sensor
+co2Sensor = CO2Sensor()
+
+# Class to manage the SD Card
+excelFile = Logger("./datalog.csv")
+
+# Class to manager the Display
+screen = DisplayScreen()

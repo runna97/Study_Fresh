@@ -30,9 +30,9 @@ except:
 
 try:
  
-    file = open('/home/pi/Study_Fresh/DTH22_Disp_Test/testlog.csv', 'a+')
+    file = open('/home/pi/Study_Fresh/Archive/All_Test/testlog.csv', 'a+')
     
-    if os.stat('/home/pi/Study_Fresh/DTH22_Disp_Test/testlog.csv').st_size == 0:
+    if os.stat('/home/pi/Study_Fresh/Archive/All_Test/testlog.csv').st_size == 0:
         
         file.write('Timestamp (MM/DD/YYYY HH:MM),Temperature (°C),Humidity (%),Co2 (ppm)\r\n')
         
@@ -118,6 +118,7 @@ while True:
         timestamp = clock.now()
         
         draw.text((x, top + 48),  timestamp.strftime('%d/%m %H:%M:%S'),  font=font, fill=255)
+        print('{0},{1:0.1f},{2:0.1f}%,{3}\r\n'.format(timestamp.strftime('%x %X'),temperature, humidity, Co2))
         
         file.write('{0},{1:0.1f},{2:0.1f}%,{3}\r\n'.format(timestamp.strftime('%x %X'),temperature, humidity, Co2))
         
