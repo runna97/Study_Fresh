@@ -92,13 +92,13 @@ def ledSelect(Co2, sleepTime):
     if Co2 >= dangerLevel:
 
         # Replace below line turn on the red LED
-        yellowLED.on()
+        greenLED.on()
 
     elif Co2 >= warningLevel:
 
         # Replace below line turn on the yellow LED
         greenLED.on()
-
+        
     else:
 
         greenLED.on()
