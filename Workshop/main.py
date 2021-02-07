@@ -120,7 +120,7 @@ def main():
 
     try:
 
-        # Get Humidity and Temperature fromse sensor
+        # Get Humidity and Temperature from sensor
         humidity, temperature = tempsensor.read_retry(
             DHT_SENSOR, DHT_PIN)
 
