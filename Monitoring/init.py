@@ -29,7 +29,7 @@ from peripherals.tempsensor import *
 from peripherals.co2 import*
 
 # Importing Display module
-from peripherals.display import *
+#from peripherals.display import *
 
 # Importing LEDs as a single module
 from peripherals.led import*
@@ -137,4 +137,4 @@ co2Sensor = CO2Sensor()
 excelFile = Logger("./datalog.csv")
 
 # Class to manager the Display
-screen = DisplayScreen()
+#screen = DisplayScreen()
